@@ -1,0 +1,61 @@
+/* import font */
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700');
+
+* {
+	box-sizing: border-box;
+	font-family: 'Roboto', sans-serif;
+}
+
+body {
+	width: 300px;
+	height: 200px;
+	background-color: #f0f0f0;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.center {
+	position: relative;
+	text-align: center;
+}
+
+#btn {
+	background-color: #4CAF50;
+	/* Green */
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+#btn:hover {
+	background-color: #45a049;
+}
+
+.social-media {
+	margin-top: 20px;
+}
+
+.social-media a {
+	color: #333;
+	text-decoration: none;
+	margin-right: 10px;
+	font-size: 17px;
+}
+
+.social-media a i {
+	font-size: 20px;
+}
+
+.social-media a i.fa-github:hover {
+	color: #4078c0;
+}
