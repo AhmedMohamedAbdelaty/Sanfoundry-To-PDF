@@ -10,9 +10,9 @@ Sanfoundry-To-PDF is a Chrome extension **in development** that scrapes multiple
 
 ## Files
 
--   [popup.js](#file:popup.js-context): Contains the main functionality of the extension, including scraping, formatting, and PDF creation.
--   [manifest.json](#file:manifest.json-context): The manifest file for the Chrome extension, which provides important metadata for the extension.
--   [popup.html](#file:popup.html-context): The HTML file for the popup interface of the extension.
+-   [popup.js](./popup.js): Contains the main functionality of the extension, including scraping, formatting, and PDF creation.
+-   [manifest.json](./manifest.json): The manifest file for the Chrome extension, which provides important metadata for the extension.
+-   [popup.html](./popup.html): The HTML file for the popup interface of the extension.
 
 ## Usage
 
@@ -23,7 +23,7 @@ Sanfoundry-To-PDF is a Chrome extension **in development** that scrapes multiple
 
 Follow these steps to install the extension:
 
-1. Clone the repository to your local machine using `git clone <repository-url>` or download the repository as a ZIP file and extract it.
+1. Clone the repository to your local machine using `git clone https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF` or download the repository as a ZIP file and extract it.
 2. Open Google Chrome or a Chromium-based browser and navigate to `chrome://extensions/`.
 3. Enable Developer Mode by clicking the toggle switch at the top right.
 4. Click the "Load unpacked" button and select the directory where you cloned the repository.
