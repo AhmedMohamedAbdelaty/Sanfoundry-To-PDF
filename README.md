@@ -1,6 +1,6 @@
-# Sanfoundry Scrapper
+# Sanfoundry-To-PDF
 
-Sanfoundry Scrapper is a Chrome extension **in development** that scrapes multiple-choice questions (MCQs) from sanfoundry.com and converts them into a PDF file.
+Sanfoundry-To-PDF is a Chrome extension **in development** that scrapes multiple-choice questions (MCQs) from sanfoundry.com and converts them into a PDF file.
 
 ## Features
 
