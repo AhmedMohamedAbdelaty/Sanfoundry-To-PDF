@@ -1,13 +1,8 @@
 let btn = document.getElementById("btn");
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  let { questions, title } = message;
-  for (let i = 0; i < questions.length; i++) {
-    let question = questions[i];
-    question.question = question.question.replace("View Answer", "");
-    question.question = i + 1 + ". " + question.question;
-    question.answer = "Answer: " + question.answer;
-  }
-  format(title, questions);
+  let title = message.title;
+  let questions = message.questions;
+  createPDF(title, questions);
 });
 
 btn.addEventListener("click", async () => {
@@ -24,103 +19,121 @@ btn.addEventListener("click", async () => {
 function scrapeData() {
   let title = document.querySelector("h1.entry-title");
   let content = document.querySelector("div.entry-content");
-  function skipAds(content, index) {
-    if (
-      content.children[index + 1].classList.contains("google-auto-placed") ||
-      content.children[index + 1].classList.contains("sf-mobile-ads")
-    )
-      return true;
-    else return false;
-  }
-
   let questions = [];
-  for (let i = 0; i < content.children.length; i++) {
+  var i = 0;
+  let isAD = function (element) {
+    if (
+      element.classList.contains("ads") ||
+      element.classList.contains("ad") ||
+      element.classList.contains("google-ads") ||
+      element.hasAttribute("data-ad") ||
+      element.classList.contains("google-auto-placed") ||
+      element.classList.contains("ap_container")
+    ) {
+      return true;
+    }
+    return false;
+  };
+  let QuestionWithCode = function (child, content) {
+    let questionText = child.innerText;
+    let codeText = "";
+    let choices = "";
+    let answer = "";
+    let explanation = "";
+    let ExplanationCode = "";
+    i++;
+    // get the code
+    while (isAD(content.children[i])) {
+      i++;
+    }
+    // get the pre tag
+    let pre = content.children[i];
+    // get the code formatted
+    codeText = pre.innerText;
+    // get the choices
+    while (content.children[i].tagName !== "P") {
+      i++;
+    }
+    let p = content.children[i];
+    choices = p.innerText;
+    choices = choices.replace("View Answer", "");
+    // get the answer
+    // while it is an AD
+    i++;
+    while (isAD(content.children[i])) {
+      i++;
+    }
+    let answerDiv = content.children[i];
+    answer = answerDiv.innerText;
+    // remove "Answer: " from the string
+    // remove "Explanation: " from the string
+    answer = answer.replace("Answer: ", "");
+    answer = answer.replace("Explanation: ", "");
+    let newAnswer = answer.split("\n");
+    answer = newAnswer[0];
+    explanation = newAnswer[1];
+    let preTag = answerDiv.querySelector("pre");
+    if (preTag) {
+      ExplanationCode = preTag.innerText;
+      explanation += "\n" + ExplanationCode;
+    }
+    return {
+      questionText,
+      codeText,
+      choices,
+      answer,
+      explanation,
+    };
+  };
+  let Question = function (child, content) {
+    let questionText = child.innerText.replace("View Answer", "");
+    let choices = questionText.split("\n").slice(1, -1).join("\n");
+    let codeText = "";
+    let answer = "";
+    let explanation = "";
+    let ExplanationCode = "";
+    i++;
+    questionText = questionText.split("\n")[0];
+    while (isAD(content.children[i])) {
+      i++;
+    }
+    let answerDiv = content.children[i];
+    answer = answerDiv.innerText;
+    answer = answer.replace("Answer: ", "");
+    answer = answer.replace("Explanation: ", "");
+    let newAnswer = answer.split("\n");
+    answer = newAnswer[0];
+    explanation = newAnswer[1];
+    let preTag = answerDiv.querySelector("pre");
+    if (preTag) {
+      ExplanationCode = preTag.innerText;
+      explanation += "\n" + ExplanationCode;
+    }
+    return {
+      questionText,
+      codeText,
+      choices,
+      answer,
+      explanation,
+    };
+  };
+  while (i < content.children.length) {
     let child = content.children[i];
-    if (child.tagName === "P") {
-      if (child.innerText.match(/^\d+\./)) {
-        // get the question
-        let question = child.innerText.replace(/^\d+\.\s*/, "");
-        let code = "";
-        let answer = "";
-        // get the answer and explanation
-        if (skipAds(content, i)) i++;
-        if (content.children[i + 1].className === "hk1_style-wrap5") {
-          question += "\n";
-          code += "\n";
-          let parentDiv = content.children[i + 1];
-          const preElement = parentDiv.querySelector("div.hk1_style");
-          const firstChild = preElement.firstElementChild;
-          firstChild.childNodes.forEach((node) => {
-            // Concatenate the text content of each <span> element
-            code += node.textContent.trim() + " ";
-            if (
-              node.textContent.trim().slice(-1) === ";" ||
-              node.textContent.trim().slice(-1) === ">  " ||
-              node.textContent.trim().slice(-1) === "{"
-            )
-              code += "\n";
-          });
-          code = code.trimEnd();
-          i += 1;
-          if (skipAds(content, i)) i++;
-
-          question += content.children[i + 1].innerText;
-          i++;
-          if (skipAds(content, i)) i++;
-        }
-        answer = content.children[i + 1].innerText;
-
-        let questionObj = {
-          question,
-          code,
-          answer: answer.replace("Answer: ", ""),
-          explanation: answer.split("Explanation: ")[1],
-        };
-        // push the object to the questions array
-        questions.push(questionObj);
+    if (child.tagName === "P" && child.innerText.match(/^\d+\./)) {
+      if (child.children.length > 0) {
+        let question = Question(child, content, i);
+        questions.push(question);
+      } else {
+        let question = QuestionWithCode(child, content, i);
+        questions.push(question);
       }
     }
+    i++;
   }
-  chrome.runtime.sendMessage({ questions, title: title.textContent });
+  chrome.runtime.sendMessage({ title: title.innerText, questions });
 }
 
-function format(title, questions) {
-  const formattedQuestions = [];
-
-  questions.forEach((question, index) => {
-    // adding code to the question if exists
-    const text = question.question.split("\n")[0].trim() + question.code;
-    const options = question.question.split("\n").slice(1);
-
-    const formattedOptions = options.map((option) => {
-      const letter = option.slice(0, 1); // Extracting option letter
-      const text = option.slice(2).trim(); // Extracting option text
-      return { letter, text };
-    });
-
-    // Extracting answer and explanation
-    const answer = question.answer
-      .split("\n")[0]
-      .replace("Answer: ", "")
-      .trim();
-    const explanation = question.answer
-      .split("\n")
-      .slice(1)
-      .join("\n")
-      .replace("Explanation: ", "")
-      .trim();
-
-    const formattedQuestion = {
-      id: index + 1, // Question number
-      text, // Question text
-      options: formattedOptions, // Formatted options
-      answer, // Answer
-      explanation, // Explanation
-    };
-    formattedQuestions.push(formattedQuestion);
-  });
-  createPDF(title, formattedQuestions);
-}
+function format(title, questions) {}
 
 function createPDF(title, questions) {
   let doc = new jsPDF("p", "mm", [250, 360]);
@@ -141,6 +154,7 @@ function createPDF(title, questions) {
     doc.text(line, x, y);
     y += lineHeight;
   });
+
   y += lineHeight;
   for (let i = 0; i < questions.length; i++) {
     doc.setFont("Times", fontStyle[0]);
@@ -160,77 +174,112 @@ function createPDF(title, questions) {
       y = 10;
       remainingHeight = doc.internal.pageSize.height - y;
     }
-    let options = question.options;
-    let questionText = question.text;
+    let questionText = question.questionText;
+    let codeText = question.codeText;
+    let choices = question.choices;
     let answer = question.answer;
     let explanation = question.explanation;
-    let textLines = doc.splitTextToSize(questionText, 230);
+    doc.setFontSize(fontSize);
+    doc.setFont("Times", fontStyle[0]);
+    doc.setTextColor(0, 0, 0);
+    let x = 10;
+    let text = questionText;
+    let textWidth =
+      (doc.getStringUnitWidth(text) * fontSize) / doc.internal.scaleFactor;
+    let textLines = doc.splitTextToSize(text, 250);
     textLines.forEach((line) => {
-      doc.text(line, 10, y);
+      doc.text(line, x, y);
       y += lineHeight;
     });
-    for (let i = 0; i < options.length - 1; i++) {
-      doc.setFont("Times", fontStyle[1]);
-      let option = options[i];
-      let letter = option.letter;
-      let text = option.text;
-      let textLines = doc.splitTextToSize(letter + ". " + text, 230);
-      textLines.forEach((line) => {
-        if (letter === answer) {
-          doc.setTextColor(0, 0, 128); // Set text color to blue
-        } else {
-          doc.setTextColor(0, 0, 0);
-        }
-        doc.text(line, 10, y);
+    if (codeText !== "") {
+      let codeLines = doc.splitTextToSize(codeText, 230);
+      codeLines.forEach((line) => {
+        doc.setFont("Courier", fontStyle[1]);
+        doc.text(line, x, y);
         y += lineHeight;
       });
     }
-    doc.setTextColor(0, 0, 0);
-    let exp = "Explanation: " + explanation;
-    let expText = doc.splitTextToSize(exp, 230);
-    expText.forEach((line) => {
-      doc.text(line, 10, y);
+    let choicesLines = doc.splitTextToSize(choices, 230);
+    for (let i = 0; i < choicesLines.length; i++) {
+      doc.setFont("Times", fontStyle[1]);
+      if (choicesLines[i].charAt(0) === answer) {
+        doc.setFont("Times", fontStyle[0]);
+        doc.setTextColor(0, 0, 128);
+      }
+      doc.text(choicesLines[i], x + 4, y);
+      doc.setFont("Times", fontStyle[1]);
+      doc.setTextColor(0, 0, 0);
+      y += lineHeight;
+    }
+    doc.setFont("Times", fontStyle[1]);
+    doc.text("Explanation:", x, y);
+    y += lineHeight;
+    let explanationLines = doc.splitTextToSize(explanation, 230);
+    explanationLines.forEach((line) => {
+      doc.text(line, x, y);
       y += lineHeight;
     });
     y += lineHeight;
+    if (y > doc.internal.pageSize.height + 300) {
+      doc.addPage();
+      y = 10;
+    }
   }
+
   doc.save(`${title}.pdf`);
 }
 
-function checkQuestionHeight(
-  doc,
-  y,
-  lineHeight,
-  remainingHeight,
-  question,
-  fontSize
-) {
-  let options = question.options;
-  let questionText = question.text;
+function checkQuestionHeight(doc, y, lineHeight, remainingHeight, question) {
+  let questionText = question.questionText;
+  let codeText = question.codeText;
+  let choices = question.choices;
   let answer = question.answer;
   let explanation = question.explanation;
-  let textLines = doc.splitTextToSize(questionText, 230);
+  let fontSize = 12;
+  let fontStyle = ["bold", "normal"];
+  let text = questionText;
+  let textWidth =
+    (doc.getStringUnitWidth(text) * fontSize) / doc.internal.scaleFactor;
+  if (remainingHeight - lineHeight * 5 < 0) {
+    return false;
+  }
+  doc.setFontSize(fontSize);
+  doc.setFont("Times", fontStyle[0]);
+  doc.setTextColor(0, 0, 0);
+  let x = 10;
+  let textLines = doc.splitTextToSize(text, 250);
   textLines.forEach((line) => {
-    // doc.text(line, 10, y);
+    // doc.text(line, x, y);
     y += lineHeight;
   });
-  for (let i = 0; i < options.length - 1; i++) {
-    let option = options[i];
-    let letter = option.letter;
-    let text = option.text;
-    let textLines = doc.splitTextToSize(letter + ". " + text, 230);
-    textLines.forEach((line) => {
-      // doc.text(line, 10, y);
+  if (codeText !== "") {
+    let codeLines = doc.splitTextToSize(codeText, 250);
+    codeLines.forEach((line) => {
+      doc.setFont("Courier", fontStyle[1]);
+      // doc.text(line, x, y);
       y += lineHeight;
     });
   }
-  let exp = "Explanation: " + explanation;
-  let expText = doc.splitTextToSize(exp, 230);
-  expText.forEach((line) => {
-    // doc.text(line, 10, y);
+  let choicesLines = doc.splitTextToSize(choices, 250);
+  choicesLines.forEach((line) => {
+    doc.setFont("Times", fontStyle[1]);
+    // doc.text(line, x, y);
     y += lineHeight;
   });
-  if (y > remainingHeight + 300) {
+  let answerLines = doc.splitTextToSize(answer, 250);
+  answerLines.forEach((line) => {
+    doc.setFont("Times", fontStyle[0]);
+    // doc.text(line, x, y);
+    y += lineHeight;
+  });
+  let explanationLines = doc.splitTextToSize(explanation, 250);
+  explanationLines.forEach((line) => {
+    doc.setFont("Times", fontStyle[1]);
+    // doc.text(line, x, y);
+    y += lineHeight;
+  });
+  y += lineHeight;
+  if (y > doc.internal.pageSize.height) {
     return false;
   }
   return true;
