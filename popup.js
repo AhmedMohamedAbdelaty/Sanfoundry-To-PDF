@@ -48,7 +48,7 @@ function scrapeData() {
           question += "\n";
           code += "\n";
           let parentDiv = content.children[i + 1];
-          const preElement = parentDiv.querySelector("div.cpp");
+          const preElement = parentDiv.querySelector("div.hk1_style");
           const firstChild = preElement.firstElementChild;
           firstChild.childNodes.forEach((node) => {
             // Concatenate the text content of each <span> element
