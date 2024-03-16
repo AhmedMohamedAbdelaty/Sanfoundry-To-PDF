@@ -56,7 +56,13 @@ Please note that since this extension is still in development, it may not functi
 
 ### Known Bugs
 
-- The extension does not function correctly when a question or answer contains a code block. We are currently working on a fix for this issue. If you have any suggestions or solutions, please feel free to contribute.
+- The extension struggles with choices presented as code blocks. Fixes are underway. Contributions are welcome.
+
+Here is a screenshot of the issue:
+<div align="center">
+
+![Screenshot from 2024-03-16 16-38-12](https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/b8b533c8-ebd6-4ec6-a12d-13a87f781cf3)
+</div>
 
 ## Contribution Guide
 
