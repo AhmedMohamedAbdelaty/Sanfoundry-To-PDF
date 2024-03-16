@@ -19,6 +19,20 @@ Sanfoundry-To-PDF is a Chrome extension **in development** that scrapes multiple
 1. Click on the extension icon in the Chrome toolbar.
 2. Click on the "Convert the MCQ to PDF" button when you are on a sanfoundry.com page with MCQs.
 
+<div align="center">
+
+![Screenshot](https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/fe980b02-1b1d-48c3-8791-1d6b74077e91)
+
+</div>
+
+### Example Output
+
+<div align="center">
+
+https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/4e263fbc-2922-44e3-828f-18fec84a7930
+
+</div>
+
 ## Installation
 
 Follow these steps to install the extension:
