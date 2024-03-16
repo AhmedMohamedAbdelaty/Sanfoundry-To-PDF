@@ -20,6 +20,21 @@ function scrapeData() {
   let title = document.querySelector("h1.entry-title");
   let content = document.querySelector("div.entry-content");
   let questions = [];
+  function formatChoices(str) {
+    // Splitting it to array contains choices and answers
+    let choices = str.split(/([a-z]\))/i);
+
+    // removing the new lines between the answer.
+    choices = choices.map((choice) => {
+      choice = choice.trim();
+      return choice;
+    });
+    let modifiedChoices = {};
+    for (let i = 1; i < choices.length; i += 2) {
+      modifiedChoices[choices[i]] = choices[i + 1] + "\n";
+    }
+    return modifiedChoices;
+  }
   var i = 0;
   let isAD = function (element) {
     if (
@@ -53,9 +68,22 @@ function scrapeData() {
     while (content.children[i].tagName !== "P") {
       i++;
     }
-    let p = content.children[i];
-    choices = p.innerText;
-    choices = choices.replace("View Answer", "");
+    let x = "";
+    if (
+      content.children[i].tagName === "P" ||
+      content.children[i].tagName === "PRE"
+    ) {
+      while (
+        content.children[i].tagName === "P" ||
+        content.children[i].tagName === "PRE"
+      ) {
+        x += content.children[i].innerText + "\n";
+        i++;
+      }
+    }
+    choices = x.replace("View Answer", "");
+    console.log(formatChoices(choices));
+    // choices = formatChoices(choices);
     // get the answer
     // while it is an AD
     i++;
