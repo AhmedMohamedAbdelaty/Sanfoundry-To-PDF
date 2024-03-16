@@ -23,12 +23,11 @@ function scrapeData() {
   var i = 0;
   let isAD = function (element) {
     if (
-      element.classList.contains("ads") ||
-      element.classList.contains("ad") ||
-      element.classList.contains("google-ads") ||
-      element.hasAttribute("data-ad") ||
       element.classList.contains("google-auto-placed") ||
-      element.classList.contains("ap_container")
+      element.classList.contains("ap_container") ||
+      element.classList.contains("google-auto-placed ap_container") ||
+      element.classList.contains("sf-mobile-ads") ||
+      element.classList.contains("sf-desktop-ads")
     ) {
       return true;
     }
@@ -71,6 +70,8 @@ function scrapeData() {
     answer = answer.replace("Explanation: ", "");
     let newAnswer = answer.split("\n");
     answer = newAnswer[0];
+    // trim the answer
+    answer = answer.trim();
     explanation = newAnswer[1];
     let preTag = answerDiv.querySelector("pre");
     if (preTag) {
@@ -103,6 +104,8 @@ function scrapeData() {
     answer = answer.replace("Explanation: ", "");
     let newAnswer = answer.split("\n");
     answer = newAnswer[0];
+    // trim the answer
+    answer = answer.trim();
     explanation = newAnswer[1];
     let preTag = answerDiv.querySelector("pre");
     if (preTag) {
@@ -129,6 +132,12 @@ function scrapeData() {
       }
     }
     i++;
+  }
+  // print title
+  console.log(title.innerText);
+  // print questions
+  for (let i = 0; i < questions.length; i++) {
+    console.log(questions[i]);
   }
   chrome.runtime.sendMessage({ title: title.innerText, questions });
 }
