@@ -50,19 +50,17 @@ Please note that since this extension is still in development, it may not functi
 
 ### To-Do List
 
-- [ ] Add support for different question formats.
+- [ ] Add support for different question formats (e.g., quizzes).
+- [ ] Add support for image-based questions.
+- [ ] Add support for math questions.
 - [ ] Implement a user-friendly interface for the popup.
 - [ ] Add an option to customize the output PDF.
 
 ### Known Bugs
 
-- The extension struggles with choices presented as code blocks. Fixes are underway. Contributions are welcome.
+- The extension struggles with questions that contain images.
+- The extension has issues with questions that contain math symbols.
 
-Here is a screenshot of the issue:
-<div align="center">
-
-![Screenshot from 2024-03-16 16-38-12](https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/b8b533c8-ebd6-4ec6-a12d-13a87f781cf3)
-</div>
 
 ## Contribution Guide
 
