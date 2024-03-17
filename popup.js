@@ -38,11 +38,13 @@ function scrapeData() {
   var i = 0;
   let isAD = function (element) {
     if (
-      element.classList.contains("google-auto-placed") ||
-      element.classList.contains("ap_container") ||
-      element.classList.contains("google-auto-placed ap_container") ||
-      element.classList.contains("sf-mobile-ads") ||
-      element.classList.contains("sf-desktop-ads")
+      element &&
+      element.classList &&
+      (element.classList.contains("google-auto-placed") ||
+        element.classList.contains("ap_container") ||
+        element.classList.contains("google-auto-placed ap_container") ||
+        element.classList.contains("sf-mobile-ads") ||
+        element.classList.contains("sf-desktop-ads"))
     ) {
       return true;
     }
@@ -57,7 +59,10 @@ function scrapeData() {
     let ExplanationCode = "";
     i++;
     // get the code
-    while (isAD(content.children[i])) {
+    while (
+      isAD(content.children[i]) ||
+      !content.children[i]?.querySelector("pre")
+    ) {
       i++;
     }
     // get the pre tag
@@ -88,6 +93,10 @@ function scrapeData() {
     // get the answer
     // while it is an AD
     while (isAD(content.children[i])) {
+      i++;
+    }
+    // the answer is in div tag, skip any other tags
+    while (content.children[i].tagName !== "DIV") {
       i++;
     }
     let answerDiv = content.children[i];
@@ -162,7 +171,21 @@ function scrapeData() {
     }
     i++;
   }
-
+  for (let i = 0; i < questions.length; i++) {
+    let question = questions[i];
+    console.log(
+      "Question: ",
+      question.questionText,
+      "\nCode: ",
+      question.codeText,
+      "\nChoices: ",
+      question.choices,
+      "\nAnswer: ",
+      question.answer,
+      "\nExplanation: ",
+      question.explanation
+    );
+  }
   chrome.runtime.sendMessage({ title: title.innerText, questions });
 }
 
