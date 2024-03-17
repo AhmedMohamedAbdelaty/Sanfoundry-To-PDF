@@ -82,11 +82,11 @@ function scrapeData() {
       }
     }
     choices = x.replace("View Answer", "");
+    choices = choices.trim();
     console.log(formatChoices(choices));
     // choices = formatChoices(choices);
     // get the answer
     // while it is an AD
-    i++;
     while (isAD(content.children[i])) {
       i++;
     }
