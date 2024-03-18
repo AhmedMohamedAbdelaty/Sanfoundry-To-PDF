@@ -262,7 +262,7 @@ function createPDF(title, questions) {
       // add the newLineCount to the y
       if (choiceKey[0] === answer) {
         doc.setFont("Times", fontStyle[0]);
-        doc.setTextColor(0, 0, 128);
+        doc.setTextColor(0, 0, 255);
       } else {
         doc.setFont("Times", fontStyle[1]);
         doc.setTextColor(0, 0, 0);
@@ -271,7 +271,7 @@ function createPDF(title, questions) {
       y += lineHeight * newLineCount;
     }
     doc.setFont("Times", fontStyle[1]);
-    doc.setTextColor(128, 0, 0);
+    doc.setTextColor(175, 0, 0);
     doc.text("Explanation:", x, y);
     y += lineHeight;
     let explanationLines = doc.splitTextToSize(explanation, 230);
