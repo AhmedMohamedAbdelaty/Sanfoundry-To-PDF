@@ -59,12 +59,23 @@ function scrapeData() {
     let ExplanationCode = "";
     i++;
     // get the code
-    while (
-      isAD(content.children[i]) ||
-      !content.children[i]?.querySelector("pre")
-    ) {
+    // skip ad
+    while (isAD(content.children[i])) {
       i++;
     }
+    // skip website recommendation
+    while (i < content.children.length) {
+      let child = content.children[i];
+      if (child.tagName === "PRE" || child.querySelector("pre")) {
+        break;
+      }
+      i++;
+    }
+    // skip ad
+    while (isAD(content.children[i])) {
+      i++;
+    }
+
     // get the pre tag
     let pre = content.children[i];
     // get the code formatted
@@ -253,6 +264,7 @@ function createPDF(title, questions) {
         y += lineHeight - 1.5;
       });
     }
+    y += 0.5;
     let choiceKeys = Object.keys(choices);
     for (let i = 0; i < choiceKeys.length; i++) {
       let choiceKey = choiceKeys[i];
@@ -270,9 +282,10 @@ function createPDF(title, questions) {
       doc.text(choiceKey + " " + choiceValue, x + 4, y);
       y += lineHeight * newLineCount;
     }
-    doc.setFont("Times", fontStyle[1]);
+    doc.setFont("Times", fontStyle[0]);
     doc.setTextColor(175, 0, 0);
     doc.text("Explanation:", x, y);
+    doc.setFont("Times", fontStyle[1]);
     y += lineHeight;
     let explanationLines = doc.splitTextToSize(explanation, 230);
     explanationLines.forEach((line) => {
