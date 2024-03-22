@@ -1,6 +1,6 @@
 # Sanfoundry-To-PDF
 
-Sanfoundry-To-PDF is a Chrome extension **in development** that scrapes multiple-choice questions (MCQs) from sanfoundry.com and converts them into a PDF file.
+Sanfoundry-To-PDF is a Chrome extension that scrapes multiple-choice questions (MCQs) from sanfoundry.com and converts them into a PDF file.
 
 ## Features
 
@@ -50,7 +50,6 @@ Please note that since this extension is still in development, it may not functi
 
 ### To-Do List
 
-- [ ] Add support for different question formats (e.g., quizzes).
 - [ ] Add support for image-based questions.
 - [ ] Add support for math questions.
 - [ ] Implement a user-friendly interface for the popup.
@@ -58,9 +57,8 @@ Please note that since this extension is still in development, it may not functi
 
 ### Known Bugs
 
-- The extension struggles with questions that contain images.
-- The extension has issues with questions that contain math symbols.
-
+- The extension does not yet support questions with LaTeX (math).
+- The extension does not yet support questions with images.
 
 ## Contribution Guide
 
