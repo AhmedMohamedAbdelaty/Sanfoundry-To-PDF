@@ -1,23 +1,21 @@
 {
-    "manifest_version": 3,
-    "name": "Sanfoundry To PDF",
-    "description": "Scrapes the Sanfoundry website and saves the questions and answers in a PDF file",
-    "version": "1.2",
-    "action": {
-        "default_popup": "popup.html"
-    },
-    "permissions": [
-        "activeTab","scripting"
-    ],
-    "web_accessible_resources": [
-        {
-            "resources": ["jspdf.min.js"],
-            "matches": ["<all_urls>"]
-        }
-    ],
-	"icons": {
-		"16": "/icons/result16.png",
-		"32": "/icons/result32.png",
-		"128": "/icons/result128.png"
-	}
+  "manifest_version": 3,
+  "name": "Sanfoundry To PDF",
+  "description": "Scrapes the Sanfoundry website and saves the questions and answers in a PDF file",
+  "version": "1.3",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "web_accessible_resources": [
+    {
+      "resources": ["jspdf.min.js", "fonts.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "/icons/result16.png",
+    "32": "/icons/result32.png",
+    "128": "/icons/result128.png"
+  }
 }

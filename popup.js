@@ -22,7 +22,7 @@ function scrapeData() {
   let questions = [];
   function formatChoices(str) {
     // Splitting it to array contains choices and answers
-    let choices = str.split(/([a-z]\))/i);
+    let choices = str.split(/(^[a-z]\))/im);
 
     // removing the new lines between the answer.
     choices = choices.map((choice) => {
@@ -136,14 +136,22 @@ function scrapeData() {
   };
   let Question = function (child, content) {
     let questionText = child.innerText.replace("View Answer", "");
-    let choices = questionText.split("\n").slice(1, -1).join("\n");
-    choices = formatChoices(choices);
+    let questionLines = questionText.split("\n");
+    let choicesStartIndex = questionLines.findIndex((line) =>
+      line.match(/^[a-z]\)/)
+    );
+    let questionLinesWithoutChoices = questionLines.slice(0, choicesStartIndex);
+    let choicesLines = questionLines.slice(choicesStartIndex, -1);
+
+    let questionTextWithoutChoices = questionLinesWithoutChoices.join("\n");
+    let choices = formatChoices(choicesLines.join("\n"));
+
     let codeText = "";
     let answer = "";
     let explanation = "";
     let ExplanationCode = "";
     i++;
-    questionText = questionText.split("\n")[0];
+
     while (isAD(content.children[i])) {
       i++;
     }
@@ -162,7 +170,7 @@ function scrapeData() {
       explanation += "\n" + ExplanationCode;
     }
     return {
-      questionText,
+      questionText: questionTextWithoutChoices,
       codeText,
       choices,
       answer,
@@ -182,47 +190,32 @@ function scrapeData() {
     }
     i++;
   }
-  for (let i = 0; i < questions.length; i++) {
-    let question = questions[i];
-    console.log(
-      "Question: ",
-      question.questionText,
-      "\nCode: ",
-      question.codeText,
-      "\nChoices: ",
-      question.choices,
-      "\nAnswer: ",
-      question.answer,
-      "\nExplanation: ",
-      question.explanation
-    );
-  }
   chrome.runtime.sendMessage({ title: title.innerText, questions });
 }
 
 function createPDF(title, questions) {
-  let doc = new jsPDF("p", "mm", [250, 360]);
+  let doc = new jsPDF("p", "mm", [1200, 700]);
   let x = 10,
     y = 10,
     lineHeight = 7,
-    fontStyle = ["bold", "normal"],
     fontSize = 12;
   doc.setFontSize(fontSize);
-  doc.setFont("Times", fontStyle[0]);
+  doc.setFont("Lato-Regular");
+  doc.setFont("Roboto-Medium");
   doc.setTextColor(0, 0, 0);
   let text = title;
   let textWidth =
     (doc.getStringUnitWidth(title) * fontSize) / doc.internal.scaleFactor;
   x = (doc.internal.pageSize.width - textWidth) / 2;
-  let textLines = doc.splitTextToSize(text, 250);
+  let textLines = doc.splitTextToSize(text, 220);
   textLines.forEach((line) => {
     doc.text(line, x, y);
     y += lineHeight;
   });
-
   y += lineHeight;
+  y += lineHeight / 2;
+  doc.setFont("Lato-Regular");
   for (let i = 0; i < questions.length; i++) {
-    doc.setFont("Times", fontStyle[0]);
     let question = questions[i];
     let remainingHeight = doc.internal.pageSize.height - y;
     if (
@@ -244,28 +237,28 @@ function createPDF(title, questions) {
     let choices = question.choices;
     let answer = question.answer;
     let explanation = question.explanation;
-    doc.setFontSize(fontSize);
-    doc.setFont("Times", fontStyle[0]);
     doc.setTextColor(0, 0, 0);
     let x = 10;
     let text = questionText;
     let textWidth =
       (doc.getStringUnitWidth(text) * fontSize) / doc.internal.scaleFactor;
-    let textLines = doc.splitTextToSize(text, 230);
+    let textLines = doc.splitTextToSize(text, 220);
     textLines.forEach((line) => {
       doc.text(line, x, y);
       y += lineHeight;
     });
     if (codeText !== "") {
-      let codeLines = doc.splitTextToSize(codeText, 230);
+      doc.setFont("courier");
+      let codeLines = doc.splitTextToSize(codeText, 220);
       codeLines.forEach((line) => {
-        doc.setFont("Courier", fontStyle[1]);
         doc.text(line, x, y);
-        y += lineHeight - 1.5;
+        y += lineHeight - 1.3;
       });
+      y += 0.5;
     }
-    y += 0.5;
+    y += 1;
     let choiceKeys = Object.keys(choices);
+    doc.setFont("Lato-Regular");
     for (let i = 0; i < choiceKeys.length; i++) {
       let choiceKey = choiceKeys[i];
       let choiceValue = choices[choiceKey];
@@ -273,21 +266,21 @@ function createPDF(title, questions) {
       let newLineCount = (choiceValue.match(/\n/g) || []).length;
       // add the newLineCount to the y
       if (choiceKey[0] === answer) {
-        doc.setFont("Times", fontStyle[0]);
+        doc.setFont("Roboto-Medium");
         doc.setTextColor(0, 0, 255);
       } else {
-        doc.setFont("Times", fontStyle[1]);
+        doc.setFont("Lato-Regular");
         doc.setTextColor(0, 0, 0);
       }
       doc.text(choiceKey + " " + choiceValue, x + 4, y);
       y += lineHeight * newLineCount;
     }
-    doc.setFont("Times", fontStyle[0]);
     doc.setTextColor(175, 0, 0);
+    doc.setFont("Roboto-Medium");
     doc.text("Explanation:", x, y);
-    doc.setFont("Times", fontStyle[1]);
+    doc.setFont("Lato-Regular");
     y += lineHeight;
-    let explanationLines = doc.splitTextToSize(explanation, 230);
+    let explanationLines = doc.splitTextToSize(explanation, 220);
     explanationLines.forEach((line) => {
       doc.text(line, x, y);
       y += lineHeight;
@@ -313,12 +306,12 @@ function checkQuestionHeight(doc, y, lineHeight, remainingHeight, question) {
   if (remainingHeight - lineHeight * 5 < 0) {
     return false;
   }
-  let textLines = doc.splitTextToSize(text, 250);
+  let textLines = doc.splitTextToSize(text, 220);
   textLines.forEach((line) => {
     y += lineHeight;
   });
   if (codeText !== "") {
-    let codeLines = doc.splitTextToSize(codeText, 250);
+    let codeLines = doc.splitTextToSize(codeText, 220);
     codeLines.forEach((line) => {
       y += lineHeight;
     });
@@ -331,11 +324,11 @@ function checkQuestionHeight(doc, y, lineHeight, remainingHeight, question) {
     y += lineHeight;
   }
 
-  let answerLines = doc.splitTextToSize(answer, 250);
+  let answerLines = doc.splitTextToSize(answer, 220);
   answerLines.forEach((line) => {
     y += lineHeight;
   });
-  let explanationLines = doc.splitTextToSize(explanation, 250);
+  let explanationLines = doc.splitTextToSize(explanation, 220);
   explanationLines.forEach((line) => {
     y += lineHeight;
   });
