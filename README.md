@@ -29,7 +29,7 @@ Sanfoundry-To-PDF is a Chrome extension that scrapes multiple-choice questions (
 
 <div align="center">
 
-https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/4e263fbc-2922-44e3-828f-18fec84a7930
+https://github.com/AhmedMohamedAbdelaty/Sanfoundry-To-PDF/assets/73834838/539918ac-15ad-4708-98dd-a718a298cfb3
 
 </div>
 
