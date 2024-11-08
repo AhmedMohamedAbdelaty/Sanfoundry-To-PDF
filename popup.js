@@ -126,6 +126,11 @@ function scrapeData() {
       ExplanationCode = preTag.innerText;
       explanation += "\n" + ExplanationCode;
     }
+    // Extract content from div with class "collapseomatic_content"
+    let collapseomaticContent = answerDiv.querySelector(".collapseomatic_content");
+    if (collapseomaticContent) {
+      explanation += "\n" + collapseomaticContent.innerText;
+    }
     return {
       questionText,
       codeText,
@@ -168,6 +173,11 @@ function scrapeData() {
     if (preTag) {
       ExplanationCode = preTag.innerText;
       explanation += "\n" + ExplanationCode;
+    }
+    // Extract content from div with class "collapseomatic_content"
+    let collapseomaticContent = answerDiv.querySelector(".collapseomatic_content");
+    if (collapseomaticContent) {
+      explanation += "\n" + collapseomaticContent.innerText;
     }
     return {
       questionText: questionTextWithoutChoices,
