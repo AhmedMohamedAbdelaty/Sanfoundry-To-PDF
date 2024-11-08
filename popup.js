@@ -120,16 +120,11 @@ function scrapeData() {
     answer = newAnswer[0];
     // trim the answer
     answer = answer.trim();
-    explanation = newAnswer[1];
+    explanation = newAnswer.slice(1).join('\n').trim();
     let preTag = answerDiv.querySelector("pre");
     if (preTag) {
       ExplanationCode = preTag.innerText;
       explanation += "\n" + ExplanationCode;
-    }
-    // Extract content from div with class "collapseomatic_content"
-    let collapseomaticContent = answerDiv.querySelector(".collapseomatic_content");
-    if (collapseomaticContent) {
-      explanation += "\n" + collapseomaticContent.innerText;
     }
     return {
       questionText,
@@ -168,16 +163,11 @@ function scrapeData() {
     answer = newAnswer[0];
     // trim the answer
     answer = answer.trim();
-    explanation = newAnswer[1];
+    explanation = newAnswer.slice(1).join('\n').trim();
     let preTag = answerDiv.querySelector("pre");
     if (preTag) {
       ExplanationCode = preTag.innerText;
       explanation += "\n" + ExplanationCode;
-    }
-    // Extract content from div with class "collapseomatic_content"
-    let collapseomaticContent = answerDiv.querySelector(".collapseomatic_content");
-    if (collapseomaticContent) {
-      explanation += "\n" + collapseomaticContent.innerText;
     }
     return {
       questionText: questionTextWithoutChoices,
